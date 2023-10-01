@@ -1,0 +1,75 @@
+from random import randint
+import matplotlib.pyplot as pyplot
+n = 0
+x = 100 #number of trials
+wins = 0
+
+#function to switch choices
+def switchy(thing):
+#takes a two element list and switches it
+  if thing[0]==1:
+    thing[0]=0
+    thing[1]=1
+  elif thing[1]==1:
+    thing[0]=1
+    thing[1]=0
+  return(thing)
+
+#function to check win
+def win(drs, choic):
+  #looks at two lists to see if there is a win
+  if drs[0]==choic[0]:
+    return(True)
+  else:
+    return(False)
+
+while n < x: 
+  #reset doors and choices
+  doors =[0,0,0]
+  choice=[0,0,0]
+  #set the door prize
+  prize = int(randint(0,2))
+  doors[prize]=1
+  #pick the door
+  pick1 = int(randint(0,2))
+  choice[pick1]=1
+  
+#this picks which door to open
+  if prize==choice:
+    if prize==0:
+      doors.pop(1)
+      choice.pop(1)
+    if prize==1:
+      doors.pop(2)
+      choice.pop(2)
+    if prize==2:
+      doors.pop(0)
+      choice.pop(0)
+  else:
+    for i in range(3):
+      if doors[i]==0 and choice[i]==0:
+        doors.pop(i)
+        choice.pop(i)
+        break
+
+#this is the new choice
+  choice2 = switchy(choice)
+
+#check for a win
+  if win(doors,choice2):
+    wins = wins + 1
+     
+n = n + 1
+
+#Trying to print the data that was ran here.
+losses = 100 - (wins*100/n)
+
+print("percent win = ", wins*100/n)
+print("theoretical percent = ", 2*100/3)
+pyplot.plot(n, wins)
+pyplot.axis([0, 1000, 0, 100])
+
+# Print the chart
+pyplot.draw('mpl')
+
+
