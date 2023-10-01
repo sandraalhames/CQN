@@ -1,0 +1,36 @@
+from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
+from qiskit import IBMQ, Aer, transpile, execute
+from qiskit.visualization import plot_histogram
+from qiskit.result import marginal_counts
+
+sender = QuantumRegister(1, '|𝜓⟩')
+alice = QuantumRegister(1, 'Alice')
+bob = QuantumRegister(1, 'Bob')
+c = ClassicalRegister(3, 'c')
+
+circuit = QuantumCircuit(sender, alice, bob, c)
+
+#Standard teleportation protocol.
+circuit.h(alice)
+circuit.cx(alice, bob)
+circuit.barrier()
+#BSM
+circuit.cx(sender, alice)
+circuit.h(sender)
+circuit.barrier(0,1)
+circuit.measure(sender, c[0])
+circuit.measure(alice, c[1])
+
+def correctGate(q, qubit, c1, c2):
+    q.x(qubit).c_if(c2, 1)
+    q.z(qubit).c_if(c1, 1)
+    
+circuit.barrier()
+
+correctGate(circuit, 2, c[0], c[1])
+
+sim = Aer.get_backend('qasm_simulator')
+job = execute(circuit, sim, shots = 1000)
+counts = job.result().get_counts(circuit)
+print(counts)
+plot_histogram(counts)
